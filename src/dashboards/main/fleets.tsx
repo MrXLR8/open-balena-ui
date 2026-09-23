@@ -28,12 +28,10 @@ import { tableCellClasses } from '@mui/material/TableCell';
 import { EditButton } from 'react-admin';
 import EnvVarButton from '../../ui/EnvVarButton';
 import { getSemver } from '../../ui/SemVerChip';
-import versions from '../../versions';
-import environment from '../../lib/reactAppEnv';
 import { resolveFleetTargetRelease } from '../../lib/targetRelease';
 import { deviceOnlineStatusField, getDeviceOnlineFilterValue } from '../../lib/deviceStatus';
 
-const isPinnedOnRelease = versions.resource('isPinnedOnRelease', environment.REACT_APP_OPEN_BALENA_API_VERSION);
+const fleetPinField = 'should be running-release';
 const fleetStatusRefreshInterval = 30000;
 const fleetCountQueryOptions = {
   refetchInterval: fleetStatusRefreshInterval,
@@ -57,7 +55,7 @@ const LatestFleetReleaseVersion: React.FC<{ fleetId: string | number }> = ({ fle
 };
 
 const FleetReleaseVersion: React.FC<{ record: Record<string, any> }> = ({ record }) => {
-  const { targetReleaseId } = resolveFleetTargetRelease({ record, pinField: isPinnedOnRelease });
+  const { targetReleaseId } = resolveFleetTargetRelease({ record, pinField: fleetPinField });
   const hasTargetRelease = targetReleaseId !== undefined && targetReleaseId !== null;
   const {
     data: targetRelease,
@@ -157,13 +155,13 @@ export const FleetCards: React.FC = () => (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 'bold' }}>Following pin</TableCell>
                               <TableCell align='right'>
-                                {record[isPinnedOnRelease] ? (
+                                {record[fleetPinField] ? (
                                   <ReferenceManyCount
                                     record={record}
                                     source='id'
                                     reference='device'
                                     target='belongs to-application'
-                                    filter={{ [`${isPinnedOnRelease}@is`]: 'null' }}
+                                    filter={{ [`${fleetPinField}@is`]: 'null' }}
                                     queryOptions={fleetCountQueryOptions}
                                   />
                                 ) : (
